@@ -1,0 +1,17 @@
+{
+  "name": "gameboy-js",
+  "version": "1.0.0",
+  "description": "A gameboy emulator implemented in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "author": "Davide Specchia <dnl.s.1992@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "vite": "^3.0.4"
+  }
+}

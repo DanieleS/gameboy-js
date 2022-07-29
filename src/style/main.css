@@ -1,0 +1,304 @@
+:root {
+  --gameboy-bg-color: #d8d8dc;
+  --gameboy-screen-frame: #687784;
+  --gameboy-screen-color: #758534;
+  --border-color: #000000;
+  --bold-border: var(--border-color) solid 3px;
+  --border-radius: 20px;
+  --spacing: max(5%, 10px);
+}
+
+@font-face {
+  font-family: "GameBoy";
+  src: url("../fonts/Early GameBoy.ttf") format("truetype");
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  padding-top: 10px;
+}
+
+#gameboy {
+  margin: auto;
+  background-color: var(--gameboy-bg-color);
+  width: calc(100% - 16px);
+  max-width: 800px;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border: var(--bold-border);
+  border-bottom: none;
+  min-height: 100%;
+}
+
+.topSection {
+  border-bottom: #aaaaaa solid 5px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.topSection::before,
+.topSection::after {
+  content: "";
+  display: block;
+  width: calc(50% / 9);
+  aspect-ratio: 1;
+}
+
+.topSection::before {
+  border-right: #aaaaaa solid 5px;
+}
+
+.topSection::after {
+  border-left: #aaaaaa solid 5px;
+}
+
+.screenSection {
+  padding: 0 var(--spacing);
+}
+
+.screenWrapper {
+  width: 100%;
+  background-color: var(--gameboy-screen-frame);
+  padding: var(--spacing);
+  border: var(--bold-border);
+  margin: auto;
+  border-radius: max(5%, 5px);
+}
+
+#screen {
+  background-color: var(--gameboy-screen-color);
+  margin: auto;
+  aspect-ratio: 160 / 144;
+  box-shadow: inset 0 0 5px 1px #000000;
+}
+
+.bottomSection {
+  padding: 10px 10%;
+  font-family: "Cabin", sans-serif;
+  font-size: clamp(10px, 5vw, 2.5rem);
+}
+
+input {
+  font-family: "GameBoy", sans-serif;
+}
+
+#uploadRom {
+  --margin: 20px;
+  font-family: "Gameboy", sans-serif;
+  width: calc(100% - var(--margin) * 2);
+  height: calc(100% - var(--margin) * 2);
+  border: 4px double black;
+  position: relative;
+  top: var(--margin);
+  left: var(--margin);
+  padding: var(--margin);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#inputRom {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+label[for="inputRom"] {
+  font-family: "Gameboy", sans-serif;
+  font-size: clamp(10px, 2vw, 1.5rem);
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.dropItHere {
+  display: none;
+}
+
+#uploadRom.drag-over {
+  border-style: dotted;
+}
+
+#uploadRom.drag-over :not(.dropItHere) {
+  display: none;
+}
+
+#uploadRom.drag-over .dropItHere {
+  display: block;
+}
+
+#screenCanvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+#screen,
+#screenCanvas {
+  border: 1px solid var(--border-color);
+}
+
+.romLoaded #screenCanvas {
+  display: block;
+}
+
+.romLoaded #uploadRom {
+  display: none;
+}
+
+.joypadSection {
+  display: none;
+  padding: var(--spacing);
+  grid-template-areas: "arrows actions" "startSelect startSelect";
+  grid-template-columns: 50% 50%;
+}
+
+.joypadSection button::after {
+  font-family: "Gameboy", sans-serif;
+}
+
+.directionalArrows {
+  grid-area: arrows;
+}
+
+.arrowsContainer {
+  width: 60%;
+  aspect-ratio: 1;
+  margin: auto;
+  position: relative;
+}
+
+.arrowsContainer button {
+  display: block;
+  position: absolute;
+  width: calc(100% / 3);
+  aspect-ratio: 1;
+  background-color: #000000;
+}
+
+.arrowsContainer::before {
+  content: "";
+  display: block;
+  aspect-ratio: 1;
+  width: calc(100% / 3);
+  position: absolute;
+  top: calc(100% / 3);
+  left: calc(100% / 3);
+  background-color: #000000;
+}
+
+.arrowsContainer .up {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  top: 0;
+  left: calc(100% / 3);
+}
+
+.arrowsContainer .down {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  bottom: 0;
+  left: calc(100% / 3);
+}
+
+.arrowsContainer .left {
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  left: 0;
+  top: calc(100% / 3);
+}
+
+.arrowsContainer .right {
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  right: 0;
+  top: calc(100% / 3);
+}
+
+.actionButtons {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.actionButtons button {
+  background-color: #93305b;
+  border-radius: 50%;
+  width: 30%;
+  aspect-ratio: 1;
+  position: relative;
+  border: var(--bold-border);
+}
+
+.actionButtons button::after {
+  position: absolute;
+  bottom: -15px;
+  right: -15px;
+  transform: rotate(-45deg);
+}
+
+.actionButtons .a {
+  top: -20px;
+}
+
+.actionButtons .a::after {
+  content: "A";
+}
+
+.actionButtons .b {
+  bottom: -20px;
+}
+
+.actionButtons .b::after {
+  content: "B";
+}
+
+.startSelect {
+  grid-area: startSelect;
+  margin-top: 70px;
+  display: flex;
+  justify-content: center;
+  gap: 5%;
+}
+
+.startSelect button {
+  height: 15px;
+  width: 20%;
+  border: var(--bold-border);
+  background-color: var(--gameboy-screen-frame);
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+  transform: rotate(-45deg);
+}
+
+.startSelect button::after {
+  font-size: 10px;
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.startSelect .start::after {
+  content: "Start";
+}
+
+.startSelect .select::after {
+  content: "Select";
+}
+
+/* Media query enabledo on touchscreens */
+@media (hover: none) and (pointer: coarse) {
+  .joypadSection {
+    display: grid;
+  }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style/reset.css" />
+    <link rel="stylesheet" href="/src/style/main.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gameboy JS</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="gameboy">
+        <div class="topSection"></div>
+        <div class="screenSection">
+          <div class="screenWrapper">
+            <div id="screen">
+              <form id="uploadRom">
+                <input type="file" name="inputRom" id="inputRom" />
+                <label for="inputRom">Choose the rom or drag it here</label>
+                <div class="dropItHere">Drop it!</div>
+              </form>
+              <canvas id="screenCanvas" width="160" height="144"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="bottomSection">GAME BOY JS</div>
+        <div class="joypadSection">
+          <div class="directionalArrows">
+            <div class="arrowsContainer">
+              <button type="button" class="up"></button>
+              <button type="button" class="down"></button>
+              <button type="button" class="left"></button>
+              <button type="button" class="right"></button>
+            </div>
+          </div>
+          <div class="actionButtons">
+            <button type="button" class="b"></button>
+            <button type="button" class="a"></button>
+          </div>
+          <div class="startSelect">
+            <button type="button" class="select"></button>
+            <button type="button" class="start"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
