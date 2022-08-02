@@ -14,6 +14,6 @@ export class Emulator {
   }
 
   public start(): void {
-    // TODO
+    this.cpu.executeStep(this.memoryBus);
   }
 }
