@@ -43,6 +43,11 @@ function activateRightmostZeros(x: number): number {
 }
 
 export function testAddCarryBit(bit: number, a: number, b: number): boolean {
-  let mask = activateRightmostZeros(1 << bit);
+  const mask = activateRightmostZeros(1 << bit);
   return (a & mask) + (b & mask) > mask;
+}
+
+export function unsignedToSignedByte(x: number): number {
+  // Trick to get a signed 8-bit value
+  return (x << 24) >> 24;
 }

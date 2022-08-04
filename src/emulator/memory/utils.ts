@@ -1,3 +1,4 @@
+import { unsignedToSignedByte } from "../cpu/math";
 import { Memory } from "./memory";
 
 /**
@@ -28,6 +29,24 @@ export function write16(memory: Memory, address: number, value: number): void {
  * @returns A signed 8-bit value
  */
 export function readSigned(memory: Memory, address: number): number {
-  // Trick to get a signed 8-bit value
-  return (memory.read(address) << 24) >> 24;
+  return unsignedToSignedByte(memory.read(address));
+}
+
+/**
+ * Read n bytes from memory starting at address.
+ * @param memory The memory to read from
+ * @param address The address to read from
+ * @param n The number of bytes to read
+ * @returns An array of n bytes
+ */
+export function readBytes(
+  memory: Memory,
+  address: number,
+  n: number
+): Uint8Array {
+  const bytes = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    bytes[i] = memory.read(address + i);
+  }
+  return bytes;
 }

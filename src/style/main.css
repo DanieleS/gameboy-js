@@ -71,7 +71,6 @@
   background-color: var(--gameboy-screen-color);
   margin: auto;
   aspect-ratio: 160 / 144;
-  box-shadow: inset 0 0 5px 1px #000000;
 }
 
 .bottomSection {
