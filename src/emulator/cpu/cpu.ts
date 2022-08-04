@@ -14,6 +14,12 @@ import {
   Register16Bit,
 } from "./instructions";
 import {
+  acknowledgeInterrupt,
+  getHighestPriorityInterrupt,
+  getInterruptAddress,
+  Interrupt,
+} from "./interrupts";
+import {
   overflowingAdd,
   overflowingSub,
   rotateLeft,
@@ -34,26 +40,28 @@ type ExecutionStep = {
 
 export class CPU {
   public registers: Registers = new Registers();
+  private masterInterruptEnable = false;
+  private halted = false;
 
-  private pop(memory: Memory): number {
-    const value = read16(memory, this.registers.SP);
-    this.registers.SP += 2;
-    return value;
-  }
+  public executeStep(memory: MemoryBus): [cycles: number, halted: boolean] {
+    const interruptStep = this.executeInterrupt(memory);
+    if (interruptStep) {
+      this.registers.PC = interruptStep.PC;
+      return [interruptStep.cycles, false];
+    }
 
-  private push(memory: Memory, value: number) {
-    this.registers.SP -= 2;
-    write16(memory, this.registers.SP, value);
-  }
+    if (this.halted) {
+      return [4, true];
+    }
 
-  public executeStep(memory: MemoryBus) {
     const instruction = this.fetchDecode(memory);
 
     const step = this.executeInstruction(instruction, memory);
 
     this.registers.PC = step.PC;
+    this.halted = step.hatled ?? false;
 
-    return step.cycles;
+    return [step.cycles, step.hatled ?? false];
   }
 
   private fetchDecode(memory: Memory): Instruction {
@@ -189,6 +197,17 @@ export class CPU {
       case "setBit":
         return this.executeSetBit(memory, instruction.bit, instruction.to);
     }
+  }
+
+  private pop(memory: Memory): number {
+    const value = read16(memory, this.registers.SP);
+    this.registers.SP += 2;
+    return value;
+  }
+
+  private push(memory: Memory, value: number) {
+    this.registers.SP -= 2;
+    write16(memory, this.registers.SP, value);
   }
 
   private executeNoop(): ExecutionStep {
@@ -768,7 +787,7 @@ export class CPU {
   }
 
   private executeDisableInterrupts(memory: MemoryBus): ExecutionStep {
-    memory.interruptEnabled = false;
+    this.masterInterruptEnable = false;
 
     return {
       PC: this.registers.PC + 1,
@@ -777,7 +796,7 @@ export class CPU {
   }
 
   private executeEnableInterrupts(memory: MemoryBus): ExecutionStep {
-    memory.interruptEnabled = true;
+    this.masterInterruptEnable = true;
 
     return {
       PC: this.registers.PC + 1,
@@ -1145,6 +1164,33 @@ export class CPU {
     setValue8(this, memory, to, newValue);
 
     return getBitArictmeticExecutionStep(this.registers.PC, to);
+  }
+
+  private executeInterrupt(memory: MemoryBus): ExecutionStep | null {
+    if (!this.masterInterruptEnable) {
+      this.halted = false;
+      return null;
+    }
+
+    const highestPriorityInterrupt = getHighestPriorityInterrupt(memory);
+    const target = highestPriorityInterrupt
+      ? getInterruptAddress(highestPriorityInterrupt)
+      : null;
+
+    if (!highestPriorityInterrupt || target === null) {
+      return null;
+    }
+
+    this.masterInterruptEnable = false;
+    this.registers.SP -= 2;
+    write16(memory, this.registers.SP, this.registers.PC);
+
+    acknowledgeInterrupt(memory, highestPriorityInterrupt);
+
+    return {
+      cycles: 12,
+      PC: target,
+    };
   }
 }
 

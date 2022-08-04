@@ -17,7 +17,7 @@ export class Emulator {
     const executeFrame = () => {
       let cycles = 0;
       while (cycles < 70256) {
-        cycles += this.cpu.executeStep(this.memoryBus);
+        cycles += this.cpu.executeStep(this.memoryBus)[0];
       }
 
       requestAnimationFrame(executeFrame);
