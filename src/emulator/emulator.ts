@@ -14,6 +14,15 @@ export class Emulator {
   }
 
   public start(): void {
-    this.cpu.executeStep(this.memoryBus);
+    const executeFrame = () => {
+      let cycles = 0;
+      while (cycles < 70256) {
+        cycles += this.cpu.executeStep(this.memoryBus);
+      }
+
+      requestAnimationFrame(executeFrame);
+    };
+
+    requestAnimationFrame(executeFrame);
   }
 }
