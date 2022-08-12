@@ -1,5 +1,6 @@
 import { Cartridge } from "../cartridge";
 import { GenericMemoryBank } from "./generic-memory-bank";
+import { IOMemory } from "./io";
 import { Memory } from "./memory";
 
 export class MemoryBus implements Memory {
@@ -8,7 +9,7 @@ export class MemoryBus implements Memory {
   public externalRam: Memory = new GenericMemoryBank(0x2000, 0xa000);
   public workRam: Memory = new GenericMemoryBank(0x2000, 0xc000);
   public oam: Memory = new GenericMemoryBank(0x100, 0xfe00);
-  public io: Memory = new GenericMemoryBank(0x80, 0xff00);
+  public io: Memory = new IOMemory();
   public hram: Memory = new GenericMemoryBank(0x7f, 0xff80);
   interruptEnabled: number = 0;
 
