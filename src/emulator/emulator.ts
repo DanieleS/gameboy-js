@@ -4,12 +4,14 @@ import { CPU } from "./cpu/cpu";
 import { Joypad, JoypadButton } from "./joypad";
 import { MemoryBus } from "./memory/memory-bus";
 import { PPU } from "./ppu/ppu";
+import { Timer } from "./timer";
 
 export class Emulator {
   private memoryBus: MemoryBus;
   private cpu: CPU;
   private ppu: PPU;
   private joypad: Joypad;
+  private timer: Timer;
 
   constructor(rom: Uint8Array) {
     const cartdige = new Cartridge(rom);
@@ -18,6 +20,7 @@ export class Emulator {
     this.cpu = new CPU();
     this.ppu = new PPU();
     this.joypad = new Joypad();
+    this.timer = new Timer();
   }
 
   public start(): void {
@@ -32,6 +35,8 @@ export class Emulator {
 
         this.ppu.updateMemory(this.memoryBus);
         this.joypad.updateMemory(this.memoryBus);
+
+        this.timer.tick(elapsedCycles, this.memoryBus);
 
         if (vsync) {
           break;
