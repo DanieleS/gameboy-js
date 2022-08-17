@@ -1,15 +1,15 @@
 import { Cartridge } from "../cartridge";
 import { GenericMemoryBank } from "./generic-memory-bank";
-import { IOMemory } from "./io";
+import { dmaAddress, IOMemory } from "./io";
 import { Memory } from "./memory";
-
+import { readBytes } from "./utils";
 export class MemoryBus implements Memory {
   public cartridge: Cartridge;
   public vram: Memory = new GenericMemoryBank(0x2000, 0x8000);
   public externalRam: Memory = new GenericMemoryBank(0x2000, 0xa000);
   public workRam: Memory = new GenericMemoryBank(0x2000, 0xc000);
-  public oam: Memory = new GenericMemoryBank(0x100, 0xfe00);
-  public io: Memory = new IOMemory();
+  public oam: GenericMemoryBank = new GenericMemoryBank(0x100, 0xfe00);
+  public io: IOMemory = new IOMemory();
   public hram: Memory = new GenericMemoryBank(0x7f, 0xff80);
   interruptEnabled: number = 0;
 
@@ -71,6 +71,11 @@ export class MemoryBus implements Memory {
       return;
     } else if (address < 0xff80) {
       this.io.write(address, value);
+
+      if (this.io.dmaTransferRequested) {
+        this.io.dmaTransferRequested = false;
+        this.dmaTransfer();
+      }
       return;
     } else if (address < 0xffff) {
       this.hram.write(address, value);
@@ -83,5 +88,13 @@ export class MemoryBus implements Memory {
     throw new Error(
       "Unimplemented memory write to address: " + address.toString(16)
     );
+  }
+
+  dmaTransfer() {
+    let address = this.io.read(dmaAddress);
+    address <<= 8;
+
+    const data = readBytes(this, address, 0x100);
+    this.oam.replaceData(data);
   }
 }

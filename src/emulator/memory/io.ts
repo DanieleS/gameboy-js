@@ -1,11 +1,14 @@
 import { GenericMemoryBank } from "./generic-memory-bank";
 import { Memory } from "./memory";
 
-const joypAddress = 0xff00;
+export const joypAddress = 0xff00;
+export const dmaAddress = 0xff46;
 
 export class IOMemory implements Memory {
   private data = new GenericMemoryBank(0x80, 0xff00);
   private joyp = 0xff;
+
+  public dmaTransferRequested = false;
 
   read(address: number): number {
     switch (address) {
@@ -20,6 +23,10 @@ export class IOMemory implements Memory {
     switch (address) {
       case joypAddress:
         this.joyp = handleJoypWrite(this.joyp, value);
+        break;
+      case dmaAddress:
+        this.dmaTransferRequested = true;
+        this.data.write(address, value);
         break;
       default:
         this.data.write(address, value);

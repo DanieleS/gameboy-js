@@ -15,6 +15,13 @@ export class GenericMemoryBank implements Memory {
     this.memory[address - this.offset] = value;
   }
 
+  replaceData(data: Uint8Array) {
+    if (data.length !== this.memory.length) {
+      throw new Error("Data length does not match memory bank size");
+    }
+    this.memory = data;
+  }
+
   toString() {
     const lines = [];
     for (let i = 0; i < this.memory.length; i += 16) {

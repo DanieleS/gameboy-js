@@ -51,3 +51,11 @@ export function unsignedToSignedByte(x: number): number {
   // Trick to get a signed 8-bit value
   return (x << 24) >> 24;
 }
+
+export function contains(from: number, to: number, value: number): boolean {
+  return from <= value && value < to;
+}
+
+export function positiveModulo(x: number, y: number): number {
+  return ((x % y) + y) % y;
+}

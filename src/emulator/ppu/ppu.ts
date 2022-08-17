@@ -1,7 +1,6 @@
 import { Interrupt, requestInterrupt } from "../cpu/interrupts";
-import { wrappingAdd } from "../cpu/math";
 import { Memory } from "../memory/memory";
-import { readBytes } from "../memory/utils";
+import { PpuMode } from "./types";
 import {
   lcdControlFromMemory,
   LcdStat,
@@ -9,9 +8,16 @@ import {
   lcdStatFromMemory,
   lcdStatToByte,
 } from "./lcd";
-import { Color, getPalette, PaletteType } from "./palette";
+import { Color, getPalette, Palette, PaletteType } from "./palette";
+import {
+  contains,
+  positiveModulo,
+  wrappingAdd,
+  wrappingSub,
+} from "../cpu/math";
+import { readBytes } from "../memory/utils";
+import { Sprite } from "./sprite";
 import { Tile } from "./tile";
-import { PpuMode } from "./types";
 
 const lyAddress = 0xff44;
 const lycAddress = 0xff45;
@@ -152,6 +158,11 @@ export class PPU {
     );
     const bgTilesInLine = this.getBgTilesInRow(memory, bgTileMapRow);
 
+    const [windowTileMapRow, windowTilesInLine] =
+      this.getWindowTilesInformations(memory);
+
+    const spritesInRow = this.getSpriteTilesInRow(memory);
+
     for (let i = 0; i < 160; i++) {
       const bgShiftedDot = wrappingAdd(i, xScroll);
       const bgTileIndex = bgTileMapRow[Math.floor(bgShiftedDot / 8)];
@@ -163,7 +174,42 @@ export class PPU {
         bgWindowPalette
       );
 
-      this.buffer[i + this.scanline * 160] = bgColor.color;
+      if (
+        lcdControl.windowEnabled &&
+        this.scanline >= windowY &&
+        i + 7 >= windowX
+      ) {
+        const windowShiftedDot = wrappingSub(wrappingAdd(i, 7), windowX);
+        const windowTileId = windowTileMapRow[Math.floor(windowShiftedDot / 8)];
+        const windowTile = windowTilesInLine.get(windowTileId)!;
+        const windowColor = windowTile.getPixel(
+          positiveModulo(windowShiftedDot, 8),
+          positiveModulo(this.scanline - windowY, 8),
+          bgWindowPalette
+        );
+
+        bgColor = windowColor;
+      }
+
+      const spriteColor = spritesInRow
+        .filter((sprite) => contains(sprite.x, sprite.x + 8, i + 8))
+        .map(
+          (sprite) =>
+            [
+              sprite,
+              sprite.getPixel(
+                positiveModulo(i - positiveModulo(sprite.x, 8), 8),
+                positiveModulo(this.scanline - positiveModulo(sprite.y, 8), 8)
+              ),
+            ] as const
+        )
+        .find(([, color]) => color !== Color.Transparent);
+
+      this.buffer[i + this.scanline * 160] = spriteColor
+        ? spriteColor[0].spriteFlags.bgAndWindowOver && bgColor.priority
+          ? bgColor.color
+          : spriteColor[1]
+        : bgColor.color;
     }
   }
 
@@ -206,5 +252,41 @@ export class PPU {
     const windowTilesInRow = this.getBgTilesInRow(memory, windowTileMapRow);
 
     return [windowTileMapRow, windowTilesInRow];
+  }
+
+  private getSpriteTilesInRow(memory: Memory) {
+    const lcdControl = lcdControlFromMemory(memory);
+
+    if (!lcdControl.objectEnable) {
+      return [];
+    }
+
+    const sprites = this.getSprites(memory);
+    const rowSprites = [];
+
+    for (const sprite of sprites) {
+      if (contains(sprite.y, sprite.y + 8, this.scanline + 16)) {
+        rowSprites.push(sprite);
+      }
+    }
+
+    rowSprites.sort((a, b) => b.x - a.x);
+
+    return rowSprites;
+  }
+
+  private getSprites(memory: Memory) {
+    const sprites = [];
+    const obp0 = getPalette(memory, PaletteType.Object0);
+    const obp1 = getPalette(memory, PaletteType.Object1);
+
+    for (let i = 0xfe00; i < 0xfea0; i += 4) {
+      const spriteData = readBytes(memory, i, 4);
+      const tile = Tile.fromMemory(memory, 0x8000 + spriteData[2] * 16);
+      const sprite = Sprite.fromBytes(spriteData, tile, obp0, obp1);
+      sprites.push(sprite);
+    }
+
+    return sprites;
   }
 }
