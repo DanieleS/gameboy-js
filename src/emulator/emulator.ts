@@ -1,6 +1,7 @@
 import { renderFrame } from "../screen";
 import { Cartridge } from "./cartridge";
 import { CPU } from "./cpu/cpu";
+import { Joypad, JoypadButton } from "./joypad";
 import { MemoryBus } from "./memory/memory-bus";
 import { PPU } from "./ppu/ppu";
 
@@ -8,6 +9,7 @@ export class Emulator {
   private memoryBus: MemoryBus;
   private cpu: CPU;
   private ppu: PPU;
+  private joypad: Joypad;
 
   constructor(rom: Uint8Array) {
     const cartdige = new Cartridge(rom);
@@ -15,6 +17,7 @@ export class Emulator {
     this.memoryBus = new MemoryBus(cartdige);
     this.cpu = new CPU();
     this.ppu = new PPU();
+    this.joypad = new Joypad();
   }
 
   public start(): void {
@@ -28,6 +31,7 @@ export class Emulator {
         }
 
         this.ppu.updateMemory(this.memoryBus);
+        this.joypad.updateMemory(this.memoryBus);
 
         if (vsync) {
           break;
@@ -42,5 +46,13 @@ export class Emulator {
     };
 
     requestAnimationFrame(executeFrame);
+  }
+
+  public sendJoypadButtonDown(input: JoypadButton) {
+    this.joypad.setKeyDown(input);
+  }
+
+  public sendJoypadButtonUp(input: JoypadButton) {
+    this.joypad.setKeyUp(input);
   }
 }

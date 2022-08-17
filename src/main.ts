@@ -1,4 +1,5 @@
 import { Emulator } from "./emulator/emulator";
+import { JoypadButton } from "./emulator/joypad";
 import { createRomUploader } from "./rom-uploader";
 
 const screen = document.getElementById("screen");
@@ -36,4 +37,35 @@ function onRomUpload(
 function startEmulator(rom: Uint8Array) {
   const emulator = new Emulator(rom);
   emulator.start();
+
+  window.addEventListener(
+    "keydown",
+    buttonHandler((button) => emulator.sendJoypadButtonDown(button))
+  );
+  window.addEventListener(
+    "keyup",
+    buttonHandler((button) => emulator.sendJoypadButtonUp(button))
+  );
+}
+
+function buttonHandler(
+  onMatch: (button: JoypadButton) => void
+): (e: KeyboardEvent) => void {
+  return (e) => {
+    const keyButtonsMap: Record<string, JoypadButton | undefined> = {
+      ArrowUp: JoypadButton.Up,
+      ArrowDown: JoypadButton.Down,
+      ArrowLeft: JoypadButton.Left,
+      ArrowRight: JoypadButton.Right,
+      KeyA: JoypadButton.A,
+      KeyS: JoypadButton.B,
+      Enter: JoypadButton.Start,
+      Backspace: JoypadButton.Select,
+    };
+    const button = keyButtonsMap[e.code];
+
+    if (typeof button !== "undefined") {
+      onMatch(button);
+    }
+  };
 }
