@@ -36,6 +36,8 @@ export class Emulator {
 
       renderFrame(this.ppu.buffer);
 
+      this.ppu.resetBuffer();
+
       requestAnimationFrame(executeFrame);
     };
 

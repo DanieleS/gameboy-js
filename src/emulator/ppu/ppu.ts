@@ -1,5 +1,5 @@
 import { Interrupt, requestInterrupt } from "../cpu/interrupts";
-import { wrappingAdd, wrappingSub } from "../cpu/math";
+import { wrappingAdd } from "../cpu/math";
 import { Memory } from "../memory/memory";
 import { readBytes } from "../memory/utils";
 import {
@@ -50,6 +50,10 @@ export class PPU {
   public updateMemory(memory: Memory) {
     memory.write(lyAddress, this.scanline);
     memory.write(lcdStatAddress, this.createStatByte(memory));
+  }
+
+  public resetBuffer() {
+    this.buffer = Array(160 * 144).fill(Color.White);
   }
 
   private createStatByte(memory: Memory): number {
@@ -127,6 +131,10 @@ export class PPU {
   private renderLine(memory: Memory) {
     const lcdControl = lcdControlFromMemory(memory);
 
+    if (!lcdControl.enabled) {
+      return;
+    }
+
     const xScroll = memory.read(scxAddress);
     const yScroll = memory.read(scyAddress);
     const windowX = memory.read(wxAddress);
@@ -174,5 +182,29 @@ export class PPU {
         return [tileIndex, tile];
       })
     );
+  }
+
+  private getWindowTilesInformations(
+    memory: Memory
+  ): [Uint8Array, Map<number, Tile>] {
+    const lcdControl = lcdControlFromMemory(memory);
+    const windowY = memory.read(wyAddress);
+    const palette = getPalette(memory, PaletteType.Background);
+
+    const windowTileMapArea = lcdControl.windowTileMapArea;
+
+    if (!lcdControl.windowEnabled || this.scanline < windowY) {
+      return [new Uint8Array(), new Map()];
+    }
+
+    const windowTileMapRow = readBytes(
+      memory,
+      windowTileMapArea + 32 * Math.floor((this.scanline - windowY) / 8),
+      32
+    );
+
+    const windowTilesInRow = this.getBgTilesInRow(memory, windowTileMapRow);
+
+    return [windowTileMapRow, windowTilesInRow];
   }
 }
