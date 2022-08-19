@@ -6,7 +6,6 @@ import { readBytes } from "./utils";
 export class MemoryBus implements Memory {
   public cartridge: Cartridge;
   public vram: Memory = new GenericMemoryBank(0x2000, 0x8000);
-  public externalRam: Memory = new GenericMemoryBank(0x2000, 0xa000);
   public workRam: Memory = new GenericMemoryBank(0x2000, 0xc000);
   public oam: GenericMemoryBank = new GenericMemoryBank(0x100, 0xfe00);
   public io: IOMemory = new IOMemory();
@@ -23,7 +22,7 @@ export class MemoryBus implements Memory {
     } else if (address < 0xa000) {
       return this.vram.read(address);
     } else if (address < 0xc000) {
-      return this.externalRam.read(address);
+      return this.cartridge.read(address);
     } else if (address < 0xe000) {
       return this.workRam.read(address);
     } else if (address < 0xfe00) {
@@ -55,7 +54,7 @@ export class MemoryBus implements Memory {
       this.vram.write(address, value);
       return;
     } else if (address < 0xc000) {
-      this.externalRam.write(address, value);
+      this.cartridge.write(address, value);
       return;
     } else if (address < 0xe000) {
       this.workRam.write(address, value);
