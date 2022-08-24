@@ -1,29 +1,35 @@
 import { renderFrame } from "../screen";
+import { EventDataByType, EventEmitter } from "../utils/event-emitter";
 import { Cartridge } from "./cartridge";
 import { CPU } from "./cpu/cpu";
+import { EmulatorEvent } from "./events";
 import { Joypad, JoypadButton } from "./joypad";
 import { MemoryBus } from "./memory/memory-bus";
 import { PPU } from "./ppu/ppu";
 import { Timer } from "./timer";
 
 export class Emulator {
+  private cartridge: Cartridge;
   private memoryBus: MemoryBus;
   private cpu: CPU;
   private ppu: PPU;
   private joypad: Joypad;
   private timer: Timer;
+  private eventEmitter = new EventEmitter<EmulatorEvent>();
 
   constructor(rom: Uint8Array) {
-    const cartdige = new Cartridge(rom);
+    this.cartridge = new Cartridge(rom, this.eventEmitter);
 
-    this.memoryBus = new MemoryBus(cartdige);
+    this.memoryBus = new MemoryBus(this.cartridge);
     this.cpu = new CPU();
     this.ppu = new PPU();
     this.joypad = new Joypad();
     this.timer = new Timer();
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
+    await this.cartridge.loadSaveFile();
+
     const executeFrame = () => {
       while (true) {
         const [elapsedCycles] = this.cpu.executeStep(this.memoryBus);
@@ -59,5 +65,19 @@ export class Emulator {
 
   public sendJoypadButtonUp(input: JoypadButton) {
     this.joypad.setKeyUp(input);
+  }
+
+  public addEventListener<T extends EmulatorEvent["type"]>(
+    type: T,
+    handler: (...args: EventDataByType<EmulatorEvent, T>) => void
+  ) {
+    this.eventEmitter.addEventListener(type, handler);
+  }
+
+  public removeEventListener<T extends EmulatorEvent["type"]>(
+    type: T,
+    handler: (...args: EventDataByType<EmulatorEvent, T>) => void
+  ) {
+    this.eventEmitter.removeEventListener(type, handler);
   }
 }

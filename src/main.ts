@@ -1,6 +1,7 @@
 import { Emulator } from "./emulator/emulator";
 import { JoypadButton } from "./emulator/joypad";
 import { createRomUploader } from "./rom-uploader";
+import { GameboyDatabase, SaveFile } from "./utils/indexed-db";
 
 const screen = document.getElementById("screen");
 const romUploaderRoot = document.getElementById("uploadRom");
@@ -34,9 +35,8 @@ function onRomUpload(
   };
 }
 
-function startEmulator(rom: Uint8Array) {
+async function startEmulator(rom: Uint8Array) {
   const emulator = new Emulator(rom);
-  emulator.start();
 
   window.addEventListener(
     "keydown",
@@ -58,6 +58,18 @@ function startEmulator(rom: Uint8Array) {
     "touchend",
     touchButtonHandler((button) => emulator.sendJoypadButtonUp(button))
   );
+
+  emulator.addEventListener("save", async (cartridge, ram) => {
+    const saveFile: SaveFile = {
+      title: cartridge.id,
+      data: new Blob([ram]),
+    };
+
+    const db = new GameboyDatabase();
+    await db.saveFiles.put(saveFile);
+  });
+
+  await emulator.start();
 }
 
 function buttonHandler(
