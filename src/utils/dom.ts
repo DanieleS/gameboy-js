@@ -8,3 +8,5 @@ export const addEventListeners: <
 ) => void = (target, events, handler) => {
   events.forEach((event) => target.addEventListener(event, handler as any));
 };
+
+export const isTouchDevice = navigator.maxTouchPoints > 0;

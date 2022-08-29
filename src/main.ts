@@ -1,8 +1,10 @@
 import { Emulator } from "./emulator/emulator";
 import { JoypadButton } from "./emulator/joypad";
 import { createRomUploader } from "./rom-uploader";
+import { isTouchDevice } from "./utils/dom";
 import { GameboyDatabase, SaveFile } from "./utils/indexed-db";
 
+const app = document.getElementById("app");
 const screen = document.getElementById("screen");
 const romUploaderRoot = document.getElementById("uploadRom");
 const romUploaderInput = document.getElementById(
@@ -70,6 +72,12 @@ async function startEmulator(rom: Uint8Array) {
   });
 
   await emulator.start();
+
+  if (app && isTouchDevice) {
+    app.requestFullscreen({
+      navigationUI: "hide",
+    });
+  }
 }
 
 function buttonHandler(
