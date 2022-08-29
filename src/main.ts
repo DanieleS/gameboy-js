@@ -46,6 +46,18 @@ function startEmulator(rom: Uint8Array) {
     "keyup",
     buttonHandler((button) => emulator.sendJoypadButtonUp(button))
   );
+
+  window.addEventListener(
+    "touchstart",
+    touchButtonHandler((button) => {
+      navigator.vibrate?.(50);
+      emulator.sendJoypadButtonDown(button);
+    })
+  );
+  window.addEventListener(
+    "touchend",
+    touchButtonHandler((button) => emulator.sendJoypadButtonUp(button))
+  );
 }
 
 function buttonHandler(
@@ -66,6 +78,20 @@ function buttonHandler(
 
     if (typeof button !== "undefined") {
       onMatch(button);
+    }
+  };
+}
+
+function touchButtonHandler(
+  onMatch: (button: JoypadButton) => void
+): (e: TouchEvent) => void {
+  return (e) => {
+    const target = e.target;
+    if (
+      target instanceof HTMLButtonElement &&
+      target.matches("[data-gameboy-button]")
+    ) {
+      onMatch(target.dataset.gameboyButton as JoypadButton);
     }
   };
 }

@@ -3,14 +3,14 @@ import { Memory } from "./memory/memory";
 const joypadStateAddress = 0xff00;
 
 export const enum JoypadButton {
-  A,
-  B,
-  Select,
-  Start,
-  Up,
-  Down,
-  Left,
-  Right,
+  A = "a",
+  B = "b",
+  Select = "select",
+  Start = "start",
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right",
 }
 
 export class Joypad {
