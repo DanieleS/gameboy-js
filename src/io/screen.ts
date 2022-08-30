@@ -1,4 +1,4 @@
-import { Color } from "./emulator/ppu/palette";
+import { Color } from "../emulator/ppu/palette";
 
 const screen = document.querySelector<HTMLCanvasElement>("#screenCanvas");
 const screenCtx = screen?.getContext("2d");

@@ -1,4 +1,4 @@
-import { renderFrame } from "../screen";
+import { renderFrame } from "../io/screen";
 import { EventDataByType, EventEmitter } from "../utils/event-emitter";
 import { Cartridge } from "./cartridge";
 import { CPU } from "./cpu/cpu";
@@ -49,7 +49,7 @@ export class Emulator {
         }
       }
 
-      renderFrame(this.ppu.buffer);
+      this.eventEmitter.emit("vsync", this.ppu.buffer);
 
       this.ppu.resetBuffer();
 

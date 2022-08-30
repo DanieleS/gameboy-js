@@ -1,8 +1,11 @@
 import { Emulator } from "./emulator/emulator";
 import { JoypadButton } from "./emulator/joypad";
 import { createRomUploader } from "./rom-uploader";
+import { renderFrame } from "./io/screen";
 import { isTouchDevice } from "./utils/dom";
 import { GameboyDatabase, SaveFile } from "./utils/indexed-db";
+import { createSaveFile } from "./io/database";
+import { registerJoypadHandlers } from "./io/joypad";
 
 const app = document.getElementById("app");
 const screen = document.getElementById("screen");
@@ -40,36 +43,10 @@ function onRomUpload(
 async function startEmulator(rom: Uint8Array) {
   const emulator = new Emulator(rom);
 
-  window.addEventListener(
-    "keydown",
-    buttonHandler((button) => emulator.sendJoypadButtonDown(button))
-  );
-  window.addEventListener(
-    "keyup",
-    buttonHandler((button) => emulator.sendJoypadButtonUp(button))
-  );
+  registerJoypadHandlers(emulator);
 
-  window.addEventListener(
-    "touchstart",
-    touchButtonHandler((button) => {
-      navigator.vibrate?.(50);
-      emulator.sendJoypadButtonDown(button);
-    })
-  );
-  window.addEventListener(
-    "touchend",
-    touchButtonHandler((button) => emulator.sendJoypadButtonUp(button))
-  );
-
-  emulator.addEventListener("save", async (cartridge, ram) => {
-    const saveFile: SaveFile = {
-      title: cartridge.id,
-      data: new Blob([ram]),
-    };
-
-    const db = new GameboyDatabase();
-    await db.saveFiles.put(saveFile);
-  });
+  emulator.addEventListener("vsync", renderFrame);
+  emulator.addEventListener("save", createSaveFile);
 
   await emulator.start();
 
@@ -78,40 +55,4 @@ async function startEmulator(rom: Uint8Array) {
       navigationUI: "hide",
     });
   }
-}
-
-function buttonHandler(
-  onMatch: (button: JoypadButton) => void
-): (e: KeyboardEvent) => void {
-  return (e) => {
-    const keyButtonsMap: Record<string, JoypadButton | undefined> = {
-      ArrowUp: JoypadButton.Up,
-      ArrowDown: JoypadButton.Down,
-      ArrowLeft: JoypadButton.Left,
-      ArrowRight: JoypadButton.Right,
-      KeyA: JoypadButton.A,
-      KeyS: JoypadButton.B,
-      Enter: JoypadButton.Start,
-      Backspace: JoypadButton.Select,
-    };
-    const button = keyButtonsMap[e.code];
-
-    if (typeof button !== "undefined") {
-      onMatch(button);
-    }
-  };
-}
-
-function touchButtonHandler(
-  onMatch: (button: JoypadButton) => void
-): (e: TouchEvent) => void {
-  return (e) => {
-    const target = e.target;
-    if (
-      target instanceof HTMLButtonElement &&
-      target.matches("[data-gameboy-button]")
-    ) {
-      onMatch(target.dataset.gameboyButton as JoypadButton);
-    }
-  };
 }
