@@ -1,4 +1,3 @@
-import { renderFrame } from "../io/screen";
 import { EventDataByType, EventEmitter } from "../utils/event-emitter";
 import { Cartridge } from "./cartridge";
 import { CPU } from "./cpu/cpu";

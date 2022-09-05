@@ -1,7 +1,7 @@
 import { Emulator } from "./emulator/emulator";
 import { JoypadButton } from "./emulator/joypad";
 import { createRomUploader } from "./rom-uploader";
-import { renderFrame } from "./io/screen";
+import { createRenderFrameHandler } from "./io/screen";
 import { isTouchDevice } from "./utils/dom";
 import { GameboyDatabase, SaveFile } from "./utils/indexed-db";
 import { createSaveFile } from "./io/database";
@@ -45,7 +45,7 @@ async function startEmulator(rom: Uint8Array) {
 
   registerJoypadHandlers(emulator);
 
-  emulator.addEventListener("vsync", renderFrame);
+  emulator.addEventListener("vsync", createRenderFrameHandler());
   emulator.addEventListener("save", createSaveFile);
 
   await emulator.start();
