@@ -1,4 +1,3 @@
-import { MemoryBus } from "../memory/memory-bus";
 import { Instruction } from "./instructions";
 
 function instructionFromOpcode(opcode: number): Instruction | "extended" {

@@ -1,11 +1,9 @@
 import { Emulator } from "./emulator/emulator";
-import { JoypadButton } from "./emulator/joypad";
-import { createRomUploader } from "./rom-uploader";
-import { createRenderFrameHandler } from "./io/screen";
-import { isTouchDevice } from "./utils/dom";
-import { GameboyDatabase, SaveFile } from "./utils/indexed-db";
 import { createSaveFile } from "./io/database";
 import { registerJoypadHandlers } from "./io/joypad";
+import { createRenderFrameHandler } from "./io/screen";
+import { createRomUploader } from "./rom-uploader";
+import { isTouchDevice } from "./utils/dom";
 
 const app = document.getElementById("app");
 const screen = document.getElementById("screen");

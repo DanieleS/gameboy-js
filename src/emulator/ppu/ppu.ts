@@ -1,6 +1,12 @@
 import { Interrupt, requestInterrupt } from "../cpu/interrupts";
+import {
+  contains,
+  positiveModulo,
+  wrappingAdd,
+  wrappingSub,
+} from "../cpu/math";
 import { Memory } from "../memory/memory";
-import { PpuMode } from "./types";
+import { readBytes } from "../memory/utils";
 import {
   lcdControlFromMemory,
   LcdStat,
@@ -8,16 +14,10 @@ import {
   lcdStatFromMemory,
   lcdStatToByte,
 } from "./lcd";
-import { Color, getPalette, Palette, PaletteType } from "./palette";
-import {
-  contains,
-  positiveModulo,
-  wrappingAdd,
-  wrappingSub,
-} from "../cpu/math";
-import { readBytes } from "../memory/utils";
+import { Color, getPalette, PaletteType } from "./palette";
 import { Sprite } from "./sprite";
 import { Tile } from "./tile";
+import { PpuMode } from "./types";
 
 const lyAddress = 0xff44;
 const lycAddress = 0xff45;

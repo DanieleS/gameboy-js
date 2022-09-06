@@ -2,7 +2,7 @@ import { EventEmitter } from "../../utils/event-emitter";
 import { GameboyDatabase } from "../../utils/indexed-db";
 import { Cartridge } from "../cartridge";
 import { contains } from "../cpu/math";
-import { EmulatorEvent, MBCEvent } from "../events";
+import { EmulatorEvent } from "../events";
 import { GenericMemoryBank } from "../memory/generic-memory-bank";
 import { Memory } from "../memory/memory";
 

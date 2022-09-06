@@ -17,7 +17,6 @@ import {
   acknowledgeInterrupt,
   getHighestPriorityInterrupt,
   getInterruptAddress,
-  Interrupt,
 } from "./interrupts";
 import {
   overflowingAdd,
