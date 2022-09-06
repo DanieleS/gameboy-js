@@ -5,7 +5,8 @@
   --border-color: #000000;
   --bold-border: var(--border-color) solid 3px;
   --border-radius: 20px;
-  --spacing: max(5%, 10px);
+  --spacing: 8px;
+  --header-height: 60px;
 }
 
 @font-face {
@@ -13,10 +14,28 @@
   src: url("../fonts/Early GameBoy.ttf") format("truetype");
 }
 
+header {
+  height: var(--header-height);
+  padding: calc(var(--spacing) * 2);
+  padding-bottom: calc(var(--spacing) * 2 + 10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: sans-serif;
+}
+
+.githubLink {
+  font-family: sans-serif;
+}
+
+.githubLink img {
+  vertical-align: middle;
+}
+
 #app {
-  height: 100vh;
+  height: calc(100vh - var(--header-height));
   width: 100vw;
-  padding-top: 10px;
+  --spacing: max(5%, 10px);
 }
 
 #gameboy {
