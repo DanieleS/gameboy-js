@@ -4,6 +4,7 @@ import { registerJoypadHandlers } from "./io/joypad";
 import { createRenderFrameHandler } from "./io/screen";
 import { createRomUploader } from "./rom-uploader";
 import { isTouchDevice } from "./utils/dom";
+import { registerSW } from "virtual:pwa-register";
 
 const app = document.getElementById("app");
 const screen = document.getElementById("screen");
@@ -53,4 +54,20 @@ async function startEmulator(rom: Uint8Array) {
       navigationUI: "hide",
     });
   }
+}
+
+if ("serviceWorker" in navigator) {
+  const refresh = registerSW({
+    onNeedRefresh() {
+      const announcementContainer = document.querySelector<HTMLDivElement>(
+        ".announcementContainer"
+      );
+      if (announcementContainer) {
+        const refreshButton = document.createElement("button");
+        refreshButton.innerText = "New version available, refresh!";
+        refreshButton.addEventListener("click", () => refresh());
+        announcementContainer.appendChild(refreshButton);
+      }
+    },
+  });
 }

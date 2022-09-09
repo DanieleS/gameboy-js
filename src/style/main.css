@@ -11,7 +11,7 @@
 
 @font-face {
   font-family: "GameBoy";
-  src: url("../fonts/Early GameBoy.ttf") format("truetype");
+  src: url("/assets/Early GameBoy.ttf") format("truetype");
 }
 
 header {
@@ -24,8 +24,12 @@ header {
   font-family: sans-serif;
 }
 
-.githubLink {
+.announcementContainer button {
   font-family: sans-serif;
+  border: none;
+  background-color: none;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .githubLink img {

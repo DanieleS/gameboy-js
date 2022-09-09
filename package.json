@@ -13,9 +13,12 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.7.4",
-    "vite": "^3.0.4"
+    "vite": "^3.0.4",
+    "vite-plugin-pwa": "^0.12.7"
   },
   "dependencies": {
-    "dexie": "^3.2.2"
+    "dexie": "^3.2.2",
+    "workbox-core": "^6.5.4",
+    "workbox-precaching": "^6.5.4"
   }
 }
