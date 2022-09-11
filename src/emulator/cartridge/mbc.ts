@@ -90,8 +90,8 @@ class Mbc3 extends BaseMbc {
       this.selectedRomBank = value ? value & 0x7f : 1;
     } else if (contains(0x4000, 0x5fff, address)) {
       this.selectedRamBank = value;
-    } else if (contains(0x6000, 0x7fff, address)) {
-      if (value !== 0) {
+    } else if (contains(0x0, 0x1fff, address)) {
+      if (value === 0) {
         this.eventEmitter.emit("save", this.cartridge, this.ram);
       }
     } else if (contains(0xa000, 0xbfff, address)) {

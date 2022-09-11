@@ -5,6 +5,7 @@ import { createRenderFrameHandler } from "./io/screen";
 import { createRomUploader } from "./rom-uploader";
 import { isTouchDevice } from "./utils/dom";
 import { registerSW } from "virtual:pwa-register";
+import { debounce } from "./utils/functions";
 
 const app = document.getElementById("app");
 const screen = document.getElementById("screen");
@@ -45,7 +46,7 @@ async function startEmulator(rom: Uint8Array) {
   registerJoypadHandlers(emulator);
 
   emulator.addEventListener("vsync", createRenderFrameHandler());
-  emulator.addEventListener("save", createSaveFile);
+  emulator.addEventListener("save", debounce(createSaveFile, 200));
 
   await emulator.start();
 
