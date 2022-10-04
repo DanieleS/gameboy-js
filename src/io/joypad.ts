@@ -28,6 +28,7 @@ function buttonHandler(
   onMatch: (button: JoypadButton) => void
 ): (e: KeyboardEvent) => void {
   return (e) => {
+    e.preventDefault();
     const keyButtonsMap: Record<string, JoypadButton | undefined> = {
       ArrowUp: JoypadButton.Up,
       ArrowDown: JoypadButton.Down,
@@ -50,6 +51,7 @@ function touchButtonHandler(
   onMatch: (button: JoypadButton) => void
 ): (e: TouchEvent) => void {
   return (e) => {
+    e.preventDefault();
     const target = e.target;
     if (
       target instanceof HTMLButtonElement &&
