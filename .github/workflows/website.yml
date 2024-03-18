@@ -18,22 +18,10 @@ jobs:
       - run: npm ci
       - run: npm run tsc
       - run: npm run build
-      - name: Archive artifact
-        shell: bash
-        run: |
-          tar \
-            --dereference --hard-dereference \
-            --directory dist \
-            -cvf ${{ runner.temp }}/artifact.tar \
-            --exclude=.git \
-            --exclude=.github \
-            .
       - name: Upload artifact
-        uses: actions/upload-artifact@main
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: 1
+          path: dist
   deploy:
     needs: build
 
@@ -49,4 +37,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
