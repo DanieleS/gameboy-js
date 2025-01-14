@@ -10,6 +10,7 @@ export class MemoryBus implements Memory {
   public oam: GenericMemoryBank = new GenericMemoryBank(0x100, 0xfe00);
   public io: IOMemory = new IOMemory();
   public hram: Memory = new GenericMemoryBank(0x7f, 0xff80);
+  public apu: Memory = new GenericMemoryBank(0x30, 0xff10);
   interruptEnabled: number = 0;
 
   constructor(cartridge: Cartridge) {
@@ -33,8 +34,10 @@ export class MemoryBus implements Memory {
       return this.oam.read(address);
     } else if (address < 0xff00) {
       return 0xff;
-    } else if (address < 0xff80) {
+    } else if (address < 0xff30) {
       return this.io.read(address);
+    } else if (address < 0xff80) {
+      return this.apu.read(address);
     } else if (address < 0xffff) {
       return this.hram.read(address);
     } else if (address === 0xffff) {
@@ -68,13 +71,16 @@ export class MemoryBus implements Memory {
       return;
     } else if (address < 0xff00) {
       return;
-    } else if (address < 0xff80) {
+    } else if (address < 0xff30) {
       this.io.write(address, value);
 
       if (this.io.dmaTransferRequested) {
         this.io.dmaTransferRequested = false;
         this.dmaTransfer();
       }
+      return;
+    } else if (address < 0xff80) {
+      this.apu.write(address, value);
       return;
     } else if (address < 0xffff) {
       this.hram.write(address, value);

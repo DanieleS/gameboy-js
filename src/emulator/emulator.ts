@@ -6,6 +6,7 @@ import { Joypad, JoypadButton } from "./joypad";
 import { MemoryBus } from "./memory/memory-bus";
 import { PPU } from "./ppu/ppu";
 import { Timer } from "./timer";
+import { APU } from "./apu";
 
 export class Emulator {
   private cartridge: Cartridge;
@@ -14,6 +15,7 @@ export class Emulator {
   private ppu: PPU;
   private joypad: Joypad;
   private timer: Timer;
+  private apu: APU;
   private eventEmitter = new EventEmitter<EmulatorEvent>();
 
   constructor(rom: Uint8Array) {
@@ -24,6 +26,7 @@ export class Emulator {
     this.ppu = new PPU();
     this.joypad = new Joypad();
     this.timer = new Timer();
+    this.apu = new APU(this.eventEmitter);
   }
 
   public async start(): Promise<void> {
@@ -42,6 +45,8 @@ export class Emulator {
         this.joypad.updateMemory(this.memoryBus);
 
         this.timer.tick(elapsedCycles, this.memoryBus);
+
+        this.apu.playAudio();
 
         if (vsync) {
           break;
