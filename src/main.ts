@@ -1,4 +1,5 @@
 import { Emulator } from "./emulator/emulator";
+import { createAudioHandler } from "./io/audio";
 import { createSaveFile } from "./io/database";
 import { registerJoypadHandlers } from "./io/joypad";
 import { createRenderFrameHandler } from "./io/screen";
@@ -47,6 +48,7 @@ async function startEmulator(rom: Uint8Array) {
 
   emulator.addEventListener("vsync", createRenderFrameHandler());
   emulator.addEventListener("save", debounce(createSaveFile, 200));
+  emulator.addEventListener("playAudio", createAudioHandler());
 
   await emulator.start();
 

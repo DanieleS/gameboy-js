@@ -13,7 +13,7 @@ export type PPUEvent = {
 
 export type APUEvent = {
   type: "playAudio";
-  data: [];
+  data: [buffer: Float32Array];
 };
 
 export type EmulatorEvent = MBCEvent | PPUEvent | APUEvent;

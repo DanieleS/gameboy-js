@@ -1,4 +1,5 @@
 import { EventDataByType, EventEmitter } from "../utils/event-emitter";
+import { APU } from "./apu/apu";
 import { Cartridge } from "./cartridge";
 import { CPU } from "./cpu/cpu";
 import { EmulatorEvent } from "./events";
@@ -14,12 +15,13 @@ export class Emulator {
   private ppu: PPU;
   private joypad: Joypad;
   private timer: Timer;
+  private apu: APU;
   private eventEmitter = new EventEmitter<EmulatorEvent>();
 
   constructor(rom: Uint8Array) {
     this.cartridge = new Cartridge(rom, this.eventEmitter);
-
-    this.memoryBus = new MemoryBus(this.cartridge);
+    this.apu = new APU();
+    this.memoryBus = new MemoryBus(this.cartridge, this.apu);
     this.cpu = new CPU();
     this.ppu = new PPU();
     this.joypad = new Joypad();
@@ -42,6 +44,11 @@ export class Emulator {
         this.joypad.updateMemory(this.memoryBus);
 
         this.timer.tick(elapsedCycles, this.memoryBus);
+
+        const audioBuf = this.apu.tick(elapsedCycles);
+        if (audioBuf) {
+          this.eventEmitter.emit("playAudio", audioBuf);
+        }
 
         if (vsync) {
           break;

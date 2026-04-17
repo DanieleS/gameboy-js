@@ -1,3 +1,4 @@
+import { APU } from "../apu/apu";
 import { Cartridge } from "../cartridge";
 import { GenericMemoryBank } from "./generic-memory-bank";
 import { dmaAddress, IOMemory } from "./io";
@@ -8,12 +9,13 @@ export class MemoryBus implements Memory {
   public vram: Memory = new GenericMemoryBank(0x2000, 0x8000);
   public workRam: Memory = new GenericMemoryBank(0x2000, 0xc000);
   public oam: GenericMemoryBank = new GenericMemoryBank(0x100, 0xfe00);
-  public io: IOMemory = new IOMemory();
+  public io: IOMemory;
   public hram: Memory = new GenericMemoryBank(0x7f, 0xff80);
   interruptEnabled: number = 0;
 
-  constructor(cartridge: Cartridge) {
+  constructor(cartridge: Cartridge, apu: APU) {
     this.cartridge = cartridge;
+    this.io = new IOMemory(apu);
   }
 
   read(address: number): number {
